@@ -21,9 +21,9 @@ def download_video(name, video_id, start_time, duration_time):
         .streams.filter(file_extension="mp4")
         .first()
     )
-    file_name = re.sub(r"[.;:,?!]", "", video.title) + ".mp4"
+    file_name = video_id + ".mp4"
     if not os.path.exists(os.path.join(FOLDER, file_name)):
-        video.download(FOLDER)
+        video.download(output_path=FOLDER, filename=file_name)
 
     output_file = os.path.join(file_path, name + "-" + video_id + ".mp4")
     if os.path.exists(output_file):
