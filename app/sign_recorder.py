@@ -1,3 +1,4 @@
+import time
 import pandas as pd
 import numpy as np
 from collections import Counter
@@ -59,8 +60,12 @@ class SignRecorder(object):
         # Create a SignModel object with the landmarks gathered during recording
         recorded_sign = SignModel(left_hand_list, right_hand_list)
 
+        startTime = time.time()
         # Compute sign similarity with DTW (ascending order)
         self.reference_signs = dtw_distances(recorded_sign, self.reference_signs)
+        endTime = time.time()
+
+        print(f"*** Time to compute distances: {endTime - startTime} seconds")
 
         # Reset variables
         self.recorded_results = []
@@ -87,4 +92,4 @@ class SignRecorder(object):
         predicted_sign, count = sign_counter[0]
         if count / batch_size < threshold:
             return "Signe inconnu"
-        return predicted_sign
+        return sign_names[0]
