@@ -21,7 +21,7 @@ def dtw_distances(recorded_sign: SignModel, reference_signs: pd.DataFrame):
 
     for idx, row in reference_signs.iterrows():
         # Initialize the row variables
-        ref_sign_name, ref_sign_model, _ = row
+        ref_sign_name, ref_sign_model, _, _ = row
 
         # If the reference sign has the same number of hands compute fastdtw
         if (recorded_sign.has_left_hand == ref_sign_model.has_left_hand) and (
