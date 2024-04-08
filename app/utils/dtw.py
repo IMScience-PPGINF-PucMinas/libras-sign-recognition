@@ -18,6 +18,8 @@ def dtw_distances(recorded_sign: SignModel, reference_signs: pd.DataFrame):
     # Embeddings of the recorded sign
     rec_left_hand = recorded_sign.lh_embedding
     rec_right_hand = recorded_sign.rh_embedding
+    rec_left_pose = recorded_sign.left_pose_embedding
+    rec_right_pose = recorded_sign.right_pose_embedding
 
     for idx, row in reference_signs.iterrows():
         # Initialize the row variables
@@ -29,10 +31,14 @@ def dtw_distances(recorded_sign: SignModel, reference_signs: pd.DataFrame):
         ):
             ref_left_hand = ref_sign_model.lh_embedding
             ref_right_hand = ref_sign_model.rh_embedding
+            ref_left_pose = ref_sign_model.left_pose_embedding
+            ref_right_pose = ref_sign_model.right_pose_embedding
 
             if recorded_sign.has_left_hand:
                 row["distance"] += list(fastdtw(rec_left_hand, ref_left_hand))[0]
+                row["distance"] += list(fastdtw(rec_left_pose, ref_left_pose))[0]
             if recorded_sign.has_right_hand:
+                row["distance"] += list(fastdtw(rec_right_pose, ref_right_pose))[0]
                 row["distance"] += list(fastdtw(rec_right_hand, ref_right_hand))[0]
 
         # If not, distance equals infinity

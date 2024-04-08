@@ -44,21 +44,22 @@ class SignRecorder(object):
 
         if np.sum(self.reference_signs["distance"].values) == 0:
             return "", self.is_recording
-        return self._get_sign_predicted(), self.is_recording
+        return self._get_sign_predicted(batch_size=1), self.is_recording
 
     def compute_distances(self):
         """
         Updates the distance column of the reference_signs
         and resets recording variables
         """
-        left_hand_list, right_hand_list = [], []
+        pose_list, left_hand_list, right_hand_list = [], [], []
         for results in self.recorded_results:
-            _, left_hand, right_hand = extract_landmarks(results)
+            pose, left_hand, right_hand = extract_landmarks(results)
+            pose_list.append(pose)
             left_hand_list.append(left_hand)
             right_hand_list.append(right_hand)
 
         # Create a SignModel object with the landmarks gathered during recording
-        recorded_sign = SignModel(left_hand_list, right_hand_list)
+        recorded_sign = SignModel(pose_list, left_hand_list, right_hand_list)
 
         startTime = time.time()
         # Compute sign similarity with DTW (ascending order)
@@ -92,4 +93,4 @@ class SignRecorder(object):
         predicted_sign, count = sign_counter[0]
         if count / batch_size < threshold:
             return "Signe inconnu"
-        return sign_names[0]
+        return predicted_sign

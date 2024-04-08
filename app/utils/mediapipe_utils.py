@@ -39,4 +39,16 @@ def draw_landmarks(image, results):
             color=(255, 249, 161), thickness=2, circle_radius=2
         ),
     )
+    # Draw pose connections
+    image = mp_drawing.draw_landmarks(
+        image,
+        landmark_list=results.pose_landmarks,
+        connections=mp_holistic.POSE_CONNECTIONS,
+        landmark_drawing_spec=mp_drawing.DrawingSpec(
+            color=(245, 117, 66), thickness=2, circle_radius=4
+        ),
+        connection_drawing_spec=mp_drawing.DrawingSpec(
+            color=(245, 66, 230), thickness=2, circle_radius=2
+        ),
+    )
     return image
