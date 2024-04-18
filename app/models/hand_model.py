@@ -62,6 +62,7 @@ class HandModel(object):
     @staticmethod
     def _get_angle_between_vectors(u: np.ndarray, v: np.ndarray) -> float:
         """
+        https://www.cuemath.com/geometry/angle-between-vectors/
         Args
             u, v: 3D vectors representing two connections
         Return
@@ -71,4 +72,6 @@ class HandModel(object):
             return 0
         dot_product = np.dot(u, v)
         norm = np.linalg.norm(u) * np.linalg.norm(v)
+
+        # TODO: we probably don't need to use the actual angle to compare
         return np.arccos(dot_product / norm)

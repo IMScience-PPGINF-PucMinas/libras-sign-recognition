@@ -10,39 +10,69 @@ class PoseModel(object):
             "wrist",
         ]
 
+        self.landmarks = {
+            "left_shoulder": landmarks[11],
+            "right_shoulder": landmarks[12],
+            "left_elbow": landmarks[13],
+            "right_elbow": landmarks[14],
+            "left_wrist": landmarks[15],
+            "right_wrist": landmarks[16],
+            "left_hip": landmarks[23],
+            "right_hip": landmarks[24],
+        }
+
+        self.tracked_angles = [
+            # 12, 11, 13
+            ["right_shoulder", "left_shoulder", "left_elbow"],
+
+            # 12, 12, 14
+            ["left_shoulder", "right_shoulder", "right_elbow"],
+
+            # 11, 13, 15
+            ["left_shoulder", "left_elbow", "left_wrist"],
+
+            # 12, 14, 16
+            ["right_shoulder", "right_elbow", "right_wrist"],
+
+            # 14, 12, 24
+            ["right_elbow", "right_shoulder", "right_hip"],
+
+            # 13, 11, 23
+            ["left_elbow", "left_shoulder", "left_hip"],
+        ]
+
         # Reshape landmarks
         landmarks = np.array(landmarks).reshape((33, 3))
 
-        self.left_arm_landmarks = self._normalize_landmarks(
-            [landmarks[lmk_idx] for lmk_idx in [11, 13, 15]]
-        )
-        self.right_arm_landmarks = self._normalize_landmarks(
-            [landmarks[lmk_idx] for lmk_idx in [12, 14, 16]]
-        )
+        computed_angles = []
 
-        self.left_arm_embedding = self.left_arm_landmarks[
-            self.landmark_names.index("wrist")
-        ].tolist()
-        self.right_arm_embedding = self.right_arm_landmarks[
-            self.landmark_names.index("wrist")
-        ].tolist()
+        for angle in self.tracked_angles:
+            vector_a = self.landmarks[angle[0]] - self.landmarks[angle[1]]
+            vector_b = self.landmarks[angle[2]] - self.landmarks[angle[1]]
 
-    def _normalize_landmarks(self, landmarks):
+            angle = self._get_angle_between_vectors(vector_a, vector_b)
+            
+            # If the angle is not NaN we store it else we store 0
+            if angle == angle:
+                computed_angles.append(angle)
+            else:
+                computed_angles.append(0)
+
+        self.left_arm_embedding = computed_angles[0:3]
+        self.right_arm_embedding = computed_angles[3:6]
+        
+    @staticmethod
+    def _get_angle_between_vectors(u: np.ndarray, v: np.ndarray) -> float:
         """
-        Normalizes dataset translation and scale
+        Args
+            u, v: 3D vectors representing two connections
+        Return
+            Angle between the two vectors
         """
-        # Take shoulder's position as origin
-        shoulder_ = landmarks[self.landmark_names.index("shoulder")]
-        landmarks -= shoulder_
+        if np.array_equal(u, v):
+            return 0
+        dot_product = np.dot(u, v)
+        norm = np.linalg.norm(u) * np.linalg.norm(v)
 
-        # Divide positions by the distance between the wrist & the middle finger
-        arm_size = self._get_distance_by_names(landmarks, "shoulder", "elbow")
-        landmarks /= arm_size
-
-        return landmarks
-
-    def _get_distance_by_names(self, landmarks, name_from, name_to):
-        landmark_from = landmarks[self.landmark_names.index(name_from)]
-        landmark_to = landmarks[self.landmark_names.index(name_to)]
-        distance = np.linalg.norm(landmark_to - landmark_from)
-        return distance
+        # TODO: we probably don't need to use the actual angle to compare
+        return np.arccos(dot_product / norm)
