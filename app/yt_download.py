@@ -1,4 +1,3 @@
-import re
 from pytube import YouTube
 import os
 from shutil import copyfile
@@ -15,6 +14,8 @@ def download_video(name, video_id, start_time, duration_time):
     file_path = os.path.join(FOLDER, name)
     if not os.path.exists(file_path):
         os.mkdir(file_path)
+
+    # print(f"Downloading {video_id}")
 
     video = (
         YouTube(f"https://www.youtube.com/watch?v={video_id}")
