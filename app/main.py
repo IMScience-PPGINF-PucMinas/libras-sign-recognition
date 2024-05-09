@@ -63,13 +63,6 @@ def offline_evaluation(reference_signs: pd.DataFrame):
     training_set = reference_signs.loc[reference_signs["signer"] != selected_signer]
     validation_set = reference_signs.loc[reference_signs["signer"] == selected_signer]
 
-    # metrics = {
-    #     "TP": 0,
-    #     "FP": 0,
-    #     "TN": 0,
-    #     "FN": 0
-    # }
-
     sign_pred = []
     sign_true = []
 
@@ -82,23 +75,13 @@ def offline_evaluation(reference_signs: pd.DataFrame):
         print(f"Predicted sign: {predicted_sign}")
         print("")
 
-        # Update metrics
-        # if predicted_sign == row['name']:
-        #     metrics["TP"] += 1
-        # else:
-        #     metrics["FN"] += 1
-
         sign_pred.append(predicted_sign)
         sign_true.append(row['name'])
 
     accuracy = accuracy_score(sign_true, sign_pred)
+    print(f"Finished cross validation for signer {selected_signer}")
+    print(f"{len(training_set)} samples in the training set, {len(validation_set)} samples in the validation set")
     print(f"Accuracy: {accuracy}")
-
-    # Compute metrics
-    # precision = metrics["TP"] / (metrics["TP"] + metrics["FP"])
-    # recall = metrics["TP"] / (metrics["TP"] + metrics["FN"])
-    # f1_score = 2 * (precision * recall) / (precision + recall)
-    # accuracy = (metrics["TP"] + metrics["TN"]) / (metrics["TP"] + metrics["TN"] + metrics["FP"] + metrics["FN"])
 
 
 if __name__ == "__main__":
