@@ -4,12 +4,6 @@ import numpy as np
 class PoseModel(object):
     def __init__(self, landmarks):
 
-        self.landmark_names = [
-            "shoulder",
-            "elbow",
-            "wrist",
-        ]
-
         self.landmarks = {
             "left_shoulder": landmarks[11],
             "right_shoulder": landmarks[12],
@@ -51,7 +45,7 @@ class PoseModel(object):
             vector_b = self.landmarks[angle[2]] - self.landmarks[angle[1]]
 
             angle = self._get_angle_between_vectors(vector_a, vector_b)
-            
+
             # If the angle is not NaN we store it else we store 0
             if angle == angle:
                 computed_angles.append(angle)
@@ -60,7 +54,7 @@ class PoseModel(object):
 
         self.left_arm_embedding = computed_angles[0:3]
         self.right_arm_embedding = computed_angles[3:6]
-        
+
     @staticmethod
     def _get_angle_between_vectors(u: np.ndarray, v: np.ndarray) -> float:
         """
