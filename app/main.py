@@ -1,15 +1,16 @@
 import cv2
 import mediapipe
-from pandas import DataFrame
+import pandas as pd
 import questionary
 
+from idk_name import evaluate
 from utils.dataset_utils import load_dataset, load_reference_signs
 from utils.mediapipe_utils import mediapipe_detection
 from sign_recorder import SignRecorder
 from webcam_manager import WebcamManager
 
 
-def online_evaluation(reference_signs: DataFrame):
+def online_evaluation(reference_signs: pd.DataFrame):
     # Object that stores mediapipe results and computes sign similarities
     sign_recorder = SignRecorder(reference_signs)
 
@@ -51,24 +52,26 @@ def online_evaluation(reference_signs: DataFrame):
         cv2.destroyAllWindows()
 
 
-def offline_evaluation(reference_signs: DataFrame):
+def offline_evaluation(reference_signs: pd.DataFrame):
     # Define cross validation variables
     signers = reference_signs["signer"].unique()
 
     selected_signer = questionary.select(
         "Select a signer to use as the validation set", choices=signers).ask()
 
-    training_set = reference_signs[reference_signs["signer"] != selected_signer]
-    validation_set = reference_signs[reference_signs["signer"] == selected_signer]
+    training_set = reference_signs.loc[reference_signs["signer"] != selected_signer]
+    validation_set = reference_signs.loc[reference_signs["signer"] == selected_signer]
 
     #  Iterate over the validation set
     for idx, row in validation_set.iterrows():
+        # Compute distance
+        predicted_sign = evaluate(row['sign_model'], training_set)
+
         print(f"Signer: {row['signer']}, Sign: {row['name']}")
         print(f"Video ID: {row['video_id']}")
         print(f"Distance: {row['distance']}")
+        print(f"Predicted sign: {predicted_sign}")
         print("")
-
-        # TODO Compute distance
 
 
 if __name__ == "__main__":
