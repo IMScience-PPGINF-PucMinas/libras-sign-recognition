@@ -2,6 +2,7 @@ import cv2
 import mediapipe
 import pandas as pd
 import questionary
+from sklearn.metrics import accuracy_score
 
 from idk_name import evaluate
 from utils.dataset_utils import load_dataset, load_reference_signs
@@ -62,16 +63,42 @@ def offline_evaluation(reference_signs: pd.DataFrame):
     training_set = reference_signs.loc[reference_signs["signer"] != selected_signer]
     validation_set = reference_signs.loc[reference_signs["signer"] == selected_signer]
 
+    # metrics = {
+    #     "TP": 0,
+    #     "FP": 0,
+    #     "TN": 0,
+    #     "FN": 0
+    # }
+
+    sign_pred = []
+    sign_true = []
+
     #  Iterate over the validation set
     for idx, row in validation_set.iterrows():
         # Compute distance
         predicted_sign = evaluate(row['sign_model'], training_set)
 
-        print(f"Signer: {row['signer']}, Sign: {row['name']}")
-        print(f"Video ID: {row['video_id']}")
-        print(f"Distance: {row['distance']}")
+        print(f"Signer: {row['signer']}, Sign: {row['name']}, Video ID: {row['video_id']}")
         print(f"Predicted sign: {predicted_sign}")
         print("")
+
+        # Update metrics
+        # if predicted_sign == row['name']:
+        #     metrics["TP"] += 1
+        # else:
+        #     metrics["FN"] += 1
+
+        sign_pred.append(predicted_sign)
+        sign_true.append(row['name'])
+
+    accuracy = accuracy_score(sign_true, sign_pred)
+    print(f"Accuracy: {accuracy}")
+
+    # Compute metrics
+    # precision = metrics["TP"] / (metrics["TP"] + metrics["FP"])
+    # recall = metrics["TP"] / (metrics["TP"] + metrics["FN"])
+    # f1_score = 2 * (precision * recall) / (precision + recall)
+    # accuracy = (metrics["TP"] + metrics["TN"]) / (metrics["TP"] + metrics["TN"] + metrics["FP"] + metrics["FN"])
 
 
 if __name__ == "__main__":

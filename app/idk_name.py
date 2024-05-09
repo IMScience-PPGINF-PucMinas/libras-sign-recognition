@@ -9,13 +9,8 @@ from utils.landmark_utils import extract_landmarks
 
 
 def evaluate(recorded_results, reference_signs):
-    startTime = time.time()
-
     # Compute sign similarity with DTW (ascending order)
     updated_reference_signs = dtw_distances(recorded_results, reference_signs)
-
-    endTime = time.time()
-    print(f"*** Time to compute distances: {endTime - startTime} seconds")
 
     return get_sign_predicted(updated_reference_signs)
 
