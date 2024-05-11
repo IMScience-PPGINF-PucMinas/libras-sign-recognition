@@ -41,7 +41,7 @@ def save_landmarks_from_video(video_name):
 
     # Set the Video stream
     cap = cv2.VideoCapture(
-        os.path.join("data", "videos", sign_name, video_name + ".mp4")
+        os.path.join("app", "data", "videos", sign_name, video_name + ".mp4")
     )
     with mp.solutions.holistic.Holistic(
         min_detection_confidence=0.5, min_tracking_confidence=0.5
@@ -62,7 +62,7 @@ def save_landmarks_from_video(video_name):
         cap.release()
 
     # Create the folder of the sign if it doesn't exists
-    path = os.path.join("data", "dataset", sign_name)
+    path = os.path.join("app", "data", "dataset", sign_name)
     if not os.path.exists(path):
         os.mkdir(path)
 

@@ -10,13 +10,13 @@ from utils.landmark_utils import save_landmarks_from_video, load_array
 def load_dataset():
     videos = [
         file_name.replace(".mp4", "")
-        for root, dirs, files in os.walk(os.path.join("data", "videos"))
+        for root, dirs, files in os.walk(os.path.join("app", "data", "videos"))
         for file_name in files
         if file_name.endswith(".mp4")
     ]
     dataset = [
         file_name.replace(".pickle", "").replace("pose_", "")
-        for root, dirs, files in os.walk(os.path.join("data", "dataset"))
+        for root, dirs, files in os.walk(os.path.join("app", "data", "dataset"))
         for file_name in files
         if file_name.endswith(".pickle") and file_name.startswith("pose_")
     ]
@@ -34,11 +34,11 @@ def load_dataset():
 
 
 def load_reference_signs(videos):
-    reference_signs = {"name": [], "sign_model": [], "distance": [], "video_id": []}
+    reference_signs = {"name": [], "sign_model": [], "signer": [], "distance": [], "video_id": []}
+
     for video_name in videos:
-        sign_name = video_name.split("-")[0]
-        video_id = video_name.split("-")[1]
-        path = os.path.join("data", "dataset", sign_name, video_name)
+        sign_name, signer, _ = video_name.split("-")
+        path = os.path.join("app", "data", "dataset", sign_name, video_name)
 
         pose_list = load_array(os.path.join(path, f"pose_{video_name}.pickle"))
         left_hand_list = load_array(os.path.join(path, f"lh_{video_name}.pickle"))
@@ -46,9 +46,10 @@ def load_reference_signs(videos):
 
         reference_signs["name"].append(sign_name)
         reference_signs["sign_model"].append(SignModel(pose_list, left_hand_list, right_hand_list))
+        reference_signs['signer'].append(signer)
         reference_signs["distance"].append(0)
-        reference_signs["video_id"].append(video_id)
-    
+        reference_signs["video_id"].append(video_name)
+
     reference_signs = pd.DataFrame(reference_signs, dtype=object)
     print(
         f'Dictionary count: {reference_signs[["name", "sign_model"]].groupby(["name"]).count()}'
