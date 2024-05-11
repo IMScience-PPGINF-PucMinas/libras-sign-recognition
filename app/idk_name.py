@@ -8,11 +8,13 @@ from models.sign_model import SignModel
 from utils.landmark_utils import extract_landmarks
 
 
-def evaluate(recorded_results, reference_signs):
+def evaluate(recorded_results, reference_signs: pd.DataFrame):
     # Compute sign similarity with DTW (ascending order)
-    updated_reference_signs = dtw_distances(recorded_results, reference_signs)
+    updated_reference_signs = dtw_distances(recorded_results, reference_signs.copy())
 
-    return get_sign_predicted(updated_reference_signs)
+    print(updated_reference_signs.head(5))
+
+    return get_sign_predicted(updated_reference_signs, batch_size=1)
 
 
 def compute_distances(recorded_results: array.array, reference_signs: pd.DataFrame):

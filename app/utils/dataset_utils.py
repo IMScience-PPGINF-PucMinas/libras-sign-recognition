@@ -10,13 +10,13 @@ from utils.landmark_utils import save_landmarks_from_video, load_array
 def load_dataset():
     videos = [
         file_name.replace(".mp4", "")
-        for root, dirs, files in os.walk(os.path.join("data", "videos"))
+        for root, dirs, files in os.walk(os.path.join("app", "data", "videos"))
         for file_name in files
         if file_name.endswith(".mp4")
     ]
     dataset = [
         file_name.replace(".pickle", "").replace("pose_", "")
-        for root, dirs, files in os.walk(os.path.join("data", "dataset"))
+        for root, dirs, files in os.walk(os.path.join("app", "data", "dataset"))
         for file_name in files
         if file_name.endswith(".pickle") and file_name.startswith("pose_")
     ]
@@ -38,7 +38,7 @@ def load_reference_signs(videos):
 
     for video_name in videos:
         sign_name, signer, _ = video_name.split("-")
-        path = os.path.join("data", "dataset", sign_name, video_name)
+        path = os.path.join("app", "data", "dataset", sign_name, video_name)
 
         pose_list = load_array(os.path.join(path, f"pose_{video_name}.pickle"))
         left_hand_list = load_array(os.path.join(path, f"lh_{video_name}.pickle"))

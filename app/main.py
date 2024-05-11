@@ -73,7 +73,7 @@ def offline_evaluation(reference_signs: pd.DataFrame):
 
         print(f"Signer: {row['signer']}, Sign: {row['name']}, Video ID: {row['video_id']}")
         print(f"Predicted sign: {predicted_sign}")
-        print("")
+        print("----------------------------------")
 
         sign_pred.append(predicted_sign)
         sign_true.append(row['name'])
