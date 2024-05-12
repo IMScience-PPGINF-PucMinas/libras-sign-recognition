@@ -36,7 +36,9 @@ def load_dataset():
 def load_reference_signs(videos):
     reference_signs = {"name": [], "sign_model": [], "signer": [], "distance": [], "video_id": []}
 
-    for video_name in videos:
+    print("\nLoading reference signs\n")
+
+    for video_name in tqdm(videos):
         sign_name, signer, _ = video_name.split("-")
         path = os.path.join("app", "data", "dataset", sign_name, video_name)
 
@@ -52,6 +54,6 @@ def load_reference_signs(videos):
 
     reference_signs = pd.DataFrame(reference_signs, dtype=object)
     print(
-        f'Dictionary count: {reference_signs[["name", "sign_model"]].groupby(["name"]).count()}'
+        f'\nDictionary count: {reference_signs[["name", "sign_model"]].groupby(["name"]).count()}\n'
     )
     return reference_signs

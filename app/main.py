@@ -2,8 +2,8 @@ import cv2
 import mediapipe
 import pandas as pd
 import questionary
-from sklearn.metrics import accuracy_score
 
+from utils.metrics_utils import compute_metrics
 from idk_name import evaluate
 from utils.dataset_utils import load_dataset, load_reference_signs
 from utils.mediapipe_utils import mediapipe_detection
@@ -66,22 +66,27 @@ def offline_evaluation(reference_signs: pd.DataFrame):
     sign_pred = []
     sign_true = []
 
+    signs_to_monitor = ['Ruim', 'Aproveitar', 'Cinco']
+
     #  Iterate over the validation set
     for _, row in validation_set.iterrows():
-        # Compute distance
-        predicted_sign = evaluate(row['sign_model'], training_set)
+        print_results = row['name'] in signs_to_monitor
 
-        print(f"Signer: {row['signer']}, Sign: {row['name']}, Video ID: {row['video_id']}")
-        print(f"Predicted sign: {predicted_sign}")
-        print("----------------------------------")
+        # Compute distance
+        predicted_sign = evaluate(row['sign_model'], training_set, print_results=print_results)
+
+        if print_results:
+            print(f"Signer: {row['signer']}, Sign: {row['name']}, Video ID: {row['video_id']}")
+            print(f"Predicted sign: {predicted_sign}")
+            print("----------------------------------")
 
         sign_pred.append(predicted_sign)
         sign_true.append(row['name'])
 
-    accuracy = accuracy_score(sign_true, sign_pred)
-    print(f"Finished cross validation for signer {selected_signer}")
+    questionary.print(f"\n\nFinished cross validation for signer: {selected_signer}", style="bold")
     print(f"{len(training_set)} samples in the training set, {len(validation_set)} samples in the validation set")
-    print(f"Accuracy: {accuracy}")
+
+    compute_metrics(sign_true, sign_pred, validation_set['name'].unique())
 
 
 if __name__ == "__main__":
