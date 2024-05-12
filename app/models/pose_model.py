@@ -35,9 +35,6 @@ class PoseModel(object):
             ["left_elbow", "left_shoulder", "left_hip"],
         ]
 
-        # Reshape landmarks
-        landmarks = np.array(landmarks).reshape((33, 3))
-
         computed_angles = []
 
         for angle in self.tracked_angles:

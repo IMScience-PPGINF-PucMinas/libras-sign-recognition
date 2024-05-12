@@ -85,9 +85,6 @@ class HandModel(object):
             ["pinky_mcp", "wrist", "ring_finger_mcp"],
         ]
 
-        # Create feature vector (list of the predefined angles between the connections)
-        landmarks = np.array(landmarks).reshape((21, 3))
-
         self.feature_vector = self._get_feature_vector()
 
     def _get_feature_vector(self) -> List[float]:
