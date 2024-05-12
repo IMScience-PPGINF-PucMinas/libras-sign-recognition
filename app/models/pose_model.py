@@ -19,20 +19,20 @@ class PoseModel(object):
             # 12, 11, 13
             ["right_shoulder", "left_shoulder", "left_elbow"],
 
-            # 12, 12, 14
-            ["left_shoulder", "right_shoulder", "right_elbow"],
-
             # 11, 13, 15
             ["left_shoulder", "left_elbow", "left_wrist"],
+
+            # 13, 11, 23
+            ["left_elbow", "left_shoulder", "left_hip"],
+
+            # 11, 12, 14
+            ["left_shoulder", "right_shoulder", "right_elbow"],
 
             # 12, 14, 16
             ["right_shoulder", "right_elbow", "right_wrist"],
 
             # 14, 12, 24
             ["right_elbow", "right_shoulder", "right_hip"],
-
-            # 13, 11, 23
-            ["left_elbow", "left_shoulder", "left_hip"],
         ]
 
         computed_angles = []
@@ -41,11 +41,11 @@ class PoseModel(object):
             vector_a = self.landmarks[angle[0]] - self.landmarks[angle[1]]
             vector_b = self.landmarks[angle[2]] - self.landmarks[angle[1]]
 
-            angle = self._get_angle_between_vectors(vector_a, vector_b)
+            angle_result = self._get_angle_between_vectors(vector_a, vector_b)
 
             # If the angle is not NaN we store it else we store 0
-            if angle == angle:
-                computed_angles.append(angle)
+            if angle_result == angle_result:
+                computed_angles.append(angle_result)
             else:
                 computed_angles.append(0)
 

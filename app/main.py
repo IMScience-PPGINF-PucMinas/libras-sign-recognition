@@ -67,7 +67,7 @@ def offline_evaluation(reference_signs: pd.DataFrame):
     sign_true = []
 
     #  Iterate over the validation set
-    for idx, row in validation_set.iterrows():
+    for _, row in validation_set.iterrows():
         # Compute distance
         predicted_sign = evaluate(row['sign_model'], training_set)
 

@@ -12,7 +12,7 @@ def evaluate(recorded_results, reference_signs: pd.DataFrame):
     # Compute sign similarity with DTW (ascending order)
     updated_reference_signs = dtw_distances(recorded_results, reference_signs.copy())
 
-    print(updated_reference_signs.head(5))
+    print(updated_reference_signs)
 
     return get_sign_predicted(updated_reference_signs, batch_size=1)
 
