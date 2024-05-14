@@ -2,6 +2,7 @@ import cv2
 import mediapipe
 import pandas as pd
 import questionary
+from tqdm import tqdm
 
 from utils.metrics_utils import compute_metrics
 from idk_name import evaluate
@@ -66,10 +67,10 @@ def offline_evaluation(reference_signs: pd.DataFrame):
     sign_pred = []
     sign_true = []
 
-    signs_to_monitor = ['Ruim', 'Aproveitar', 'Cinco']
+    signs_to_monitor = []
 
     #  Iterate over the validation set
-    for _, row in validation_set.iterrows():
+    for _, row in tqdm(validation_set.iterrows(), total=validation_set.shape[0]):
         print_results = row['name'] in signs_to_monitor
 
         # Compute distance
@@ -86,7 +87,7 @@ def offline_evaluation(reference_signs: pd.DataFrame):
     questionary.print(f"\n\nFinished cross validation for signer: {selected_signer}", style="bold")
     print(f"{len(training_set)} samples in the training set, {len(validation_set)} samples in the validation set")
 
-    compute_metrics(sign_true, sign_pred, validation_set['name'].unique())
+    compute_metrics(sign_true, sign_pred)
 
 
 if __name__ == "__main__":
