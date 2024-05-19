@@ -3,6 +3,7 @@ import mediapipe
 import pandas as pd
 import questionary
 from tqdm import tqdm
+import numpy as np
 
 from utils.metrics_utils import compute_metrics
 from idk_name import evaluate
@@ -56,38 +57,48 @@ def online_evaluation(reference_signs: pd.DataFrame):
 
 def offline_evaluation(reference_signs: pd.DataFrame):
     # Define cross validation variables
-    signers = reference_signs["signer"].unique()
+    signer_options = np.append(reference_signs["signer"].unique(), 'All')
 
     selected_signer = questionary.select(
-        "Select a signer to use as the validation set", choices=signers).ask()
+        "Select a signer to use as the validation set", choices=signer_options).ask()
 
-    training_set = reference_signs.loc[reference_signs["signer"] != selected_signer]
-    validation_set = reference_signs.loc[reference_signs["signer"] == selected_signer]
+    if selected_signer == 'All':
+        selected_signer = reference_signs["signer"].unique()
+    else:
+        selected_signer = [selected_signer]
 
-    sign_pred = []
-    sign_true = []
+    print(f"Selected signers: {selected_signer}")
 
-    signs_to_monitor = []
+    for signer in selected_signer:
+        training_set = reference_signs.loc[reference_signs["signer"] != signer]
+        validation_set = reference_signs.loc[reference_signs["signer"] == signer]
 
-    #  Iterate over the validation set
-    for _, row in tqdm(validation_set.iterrows(), total=validation_set.shape[0]):
-        print_results = row['name'] in signs_to_monitor
+        sign_pred = []
+        sign_true = []
 
-        # Compute distance
-        predicted_sign = evaluate(row['sign_model'], training_set, print_results=print_results)
+        signs_to_monitor = []
 
-        if print_results:
-            print(f"Signer: {row['signer']}, Sign: {row['name']}, Video ID: {row['video_id']}")
-            print(f"Predicted sign: {predicted_sign}")
-            print("----------------------------------")
+        #  Iterate over the validation set
+        for _, row in tqdm(validation_set.iterrows(), total=validation_set.shape[0]):
+            print_results = row['name'] in signs_to_monitor
 
-        sign_pred.append(predicted_sign)
-        sign_true.append(row['name'])
+            # Compute distance
+            predicted_sign = evaluate(row['sign_model'], training_set, print_results=print_results)
 
-    questionary.print(f"\n\nFinished cross validation for signer: {selected_signer}", style="bold")
-    print(f"{len(training_set)} samples in the training set, {len(validation_set)} samples in the validation set")
+            if print_results:
+                print(f"Signer: {row['signer']}, Sign: {row['name']}, Video ID: {row['video_id']}")
+                print(f"Predicted sign: {predicted_sign}")
+                print("----------------------------------")
 
-    compute_metrics(sign_true, sign_pred)
+            sign_pred.append(predicted_sign)
+            sign_true.append(row['name'])
+
+        questionary.print(f"\n\nFinished cross validation for signer: {signer}", style="bold")
+        print(f"{len(training_set)} samples in the training set, {len(validation_set)} samples in the validation set")
+
+        compute_metrics(sign_true, sign_pred)
+
+    questionary.press_any_key_to_continue()
 
 
 if __name__ == "__main__":

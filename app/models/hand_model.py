@@ -42,7 +42,7 @@ class HandModel(object):
             "pinky_tip": landmarks[20],
         }
 
-        self.tracked_angles = [
+        self.tracked_joints = [
             # 0, 1, 2
             ["wrist", "thumb_cmc", "thumb_mcp"],
             # 1, 2, 3
@@ -99,7 +99,7 @@ class HandModel(object):
 
         angles_list = []
 
-        for angle in self.tracked_angles:
+        for angle in self.tracked_joints:
             vector_a = self.landmarks[angle[0]] - self.landmarks[angle[1]]
             vector_b = self.landmarks[angle[2]] - self.landmarks[angle[1]]
 

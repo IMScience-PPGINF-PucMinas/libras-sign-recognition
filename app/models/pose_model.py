@@ -15,7 +15,7 @@ class PoseModel(object):
             "right_hip": landmarks[24],
         }
 
-        self.tracked_angles = [
+        self.tracked_joints = [
             # 12, 11, 13
             ["right_shoulder", "left_shoulder", "left_elbow"],
 
@@ -37,7 +37,7 @@ class PoseModel(object):
 
         computed_angles = []
 
-        for angle in self.tracked_angles:
+        for angle in self.tracked_joints:
             vector_a = self.landmarks[angle[0]] - self.landmarks[angle[1]]
             vector_b = self.landmarks[angle[2]] - self.landmarks[angle[1]]
 
@@ -53,6 +53,11 @@ class PoseModel(object):
         self.right_arm_embedding = computed_angles[3:6]
 
     @staticmethod
+    def _unit_vector(vector: np.ndarray) -> np.ndarray:
+        """ Returns the unit vector of the vector.  """
+        return vector / np.linalg.norm(vector)
+
+    @staticmethod
     def _get_angle_between_vectors(u: np.ndarray, v: np.ndarray) -> float:
         """
         Args
@@ -62,8 +67,10 @@ class PoseModel(object):
         """
         if np.array_equal(u, v):
             return 0
-        dot_product = np.dot(u, v)
-        norm = np.linalg.norm(u) * np.linalg.norm(v)
 
-        # TODO: we probably don't need to use the actual angle to compare
-        return np.arccos(dot_product / norm)
+        v1_u = PoseModel._unit_vector(u)
+        v1_v = PoseModel._unit_vector(v)
+
+        angle = np.arccos(np.clip(np.dot(v1_u, v1_v), -1.0, 1.0))
+
+        return angle
