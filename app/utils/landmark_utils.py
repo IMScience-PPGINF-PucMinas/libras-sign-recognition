@@ -49,7 +49,11 @@ def save_landmarks_from_video(video_name):
     ) as holistic:
         while cap.isOpened():
             ret, frame = cap.read()
+
             if ret:
+                # Crop the frame to define the region of interest
+                frame = frame[:960, :]
+
                 # Make detections
                 image, results = mediapipe_detection(frame, holistic)
 
